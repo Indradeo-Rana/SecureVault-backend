@@ -22,6 +22,7 @@ public class Credential {
 
     private String username;
 
+    @Column(nullable = false)
     private String password;
 
     private String website;
@@ -33,4 +34,10 @@ public class Credential {
     private User user;
 
     private boolean deleted = false;
+
+    // team vault
+    @ManyToOne
+    @JoinColumn(name = "team_id")
+    private Team team;
+
 }

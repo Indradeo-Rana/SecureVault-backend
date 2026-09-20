@@ -3,7 +3,6 @@ package in.infosys.backend.controller;
 import in.infosys.backend.dto.CredentialCreateRequestDto;
 import in.infosys.backend.dto.CredentialResponseDto;
 import in.infosys.backend.dto.CredentialUpdateRequestDto;
-import in.infosys.backend.entity.Credential;
 import in.infosys.backend.service.CredentialService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +21,10 @@ public class CredentialController {
 
     // POST --> Create a new credential
     @PostMapping
-    public ResponseEntity<Credential> addCredential(
+    public ResponseEntity<CredentialResponseDto> addCredential(
             @RequestBody CredentialCreateRequestDto credential
     ){
-       Credential createdCredential = credentialService
+       CredentialResponseDto createdCredential = credentialService
                .createCredential(credential);
        return ResponseEntity
                .status(HttpStatus.CREATED)
@@ -47,7 +46,7 @@ public class CredentialController {
 
     // PUT --> Update a credential by ID
     @PutMapping("/{id}")
-    public  ResponseEntity<Credential> updateCredential(
+    public  ResponseEntity<CredentialResponseDto> updateCredential(
             @PathVariable Long id,
             @RequestBody CredentialUpdateRequestDto credential
     ){

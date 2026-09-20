@@ -27,6 +27,7 @@ public class CredentialResponseDto {
 
     private Boolean deleted;
 
+//    private String message;
 
     // convert Credential entity to list of CredentialResponseDto
     public static CredentialResponseDto fromEntity(Credential credential) {

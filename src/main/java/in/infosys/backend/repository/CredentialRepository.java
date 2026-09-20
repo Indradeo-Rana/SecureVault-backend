@@ -35,4 +35,6 @@ public interface CredentialRepository extends JpaRepository<Credential, Long> {
             Long id,
             User user
     );
+
+    Optional<Credential> findByIdAndDeletedFalse(Long id);
 }
