@@ -23,15 +23,17 @@ public class CredentialShareService {
     private final CredentialShareRepository credentialShareRepository;
     private final CredentialRepository credentialRepository;
     private final UserRepository userRepository;
+    private final AuditLogService auditLogService;
 
     public CredentialShareService(
             CredentialShareRepository credentialShareRepository,
             CredentialRepository credentialRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository, AuditLogService auditLogService) {
 
         this.credentialShareRepository = credentialShareRepository;
         this.credentialRepository = credentialRepository;
         this.userRepository = userRepository;
+        this.auditLogService = auditLogService;
     }
 
     // =========================================================
@@ -141,6 +143,20 @@ public class CredentialShareService {
 
         share =
                 credentialShareRepository.save(share);
+
+        // Create an audit log entry
+        auditLogService.log(
+                "SHARE",
+                "CREDENTIAL",
+                credential.getId(),
+                "Shared credential '"
+                        + credential.getTitle()
+                        + "' with "
+                        + sharedWith.getUsername()
+                        + " using "
+                        + share.getPermission()
+                        + " permission"
+        );
 
         return toResponse(share);
     }
@@ -300,6 +316,17 @@ public class CredentialShareService {
         share.setRevoked(true);
 
         credentialShareRepository.save(share);
+
+        // create audit
+        auditLogService.log(
+                "REVOKE_SHARE",
+                "CREDENTIAL",
+                share.getCredential().getId(),
+                "Revoked sharing of credential '"
+                        + share.getCredential().getTitle()
+                        + "' from "
+                        + share.getSharedWith().getUsername()
+        );
     }
 
 
@@ -366,6 +393,17 @@ public class CredentialShareService {
         share.setPermission(request.getPermission());
 
         share = credentialShareRepository.save(share);
+
+        // creating audit log
+        auditLogService.log(
+                "UPDATE_SHARE_PERMISSION",
+                "CREDENTIAL",
+                share.getCredential().getId(),
+                "Changed sharing permission for '"
+                        + share.getCredential().getTitle()
+                        + "' to "
+                        + share.getPermission()
+        );
 
         return toResponse(share);
     }

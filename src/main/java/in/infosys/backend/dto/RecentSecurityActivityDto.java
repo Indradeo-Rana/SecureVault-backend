@@ -1,19 +1,21 @@
 package in.infosys.backend.dto;
 
-import in.infosys.backend.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthResponseDto extends User {
+public class RecentSecurityActivityDto {
 
-    private String token;
-    private String username;
-    private String email;
-    private String message;
+    private String type;
+
+    private String description;
+
+    private LocalDateTime timestamp;
 }

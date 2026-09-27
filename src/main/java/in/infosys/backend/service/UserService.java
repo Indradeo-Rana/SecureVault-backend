@@ -5,6 +5,7 @@ import in.infosys.backend.dto.LoginRequestDto;
 import in.infosys.backend.dto.RegisterRequestDto;
 import in.infosys.backend.entity.User;
 import in.infosys.backend.repository.UserRepository;
+import in.infosys.backend.security.CustomUserDetails;
 import in.infosys.backend.security.JwtService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -68,7 +69,9 @@ public class UserService {
                 throw new BadCredentialsException("Invalid username or password");
             }
             // password is valid, generate JWT token and return response
-            String token = jwtService.generateToken(user.getUsername());
+            String token = jwtService.generateToken(
+                    new CustomUserDetails(user)
+            );
             return new AuthResponseDto(token,
                     user.getUsername(),
                     user.getEmail(),

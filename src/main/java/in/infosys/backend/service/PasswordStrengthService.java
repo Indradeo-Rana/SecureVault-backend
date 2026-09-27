@@ -67,11 +67,11 @@ public class PasswordStrengthService {
 
         // 9. Determine the length
         String strength;
-        if(score <= 2){
-            strength =" Weak";
-        } else if(score < 7){
+        if (score <= 2) {
+            strength = "Weak";
+        } else if (score <= 4) {
             strength = "Medium";
-        }else{
+        } else {
             strength = "Strong";
         }
 

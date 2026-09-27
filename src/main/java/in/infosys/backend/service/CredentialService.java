@@ -22,12 +22,14 @@ public class CredentialService {
     private final UserRepository userRepository;
     private final EncryptionService encryptionService;
     private final CredentialShareService credentialShareService;
+    private final AuditLogService auditLogService;
 
-    public CredentialService(CredentialRepository credentialRepository, UserRepository userRepository, EncryptionService encryptionService, CredentialShareService credentialShareService) {
+    public CredentialService(CredentialRepository credentialRepository, UserRepository userRepository, EncryptionService encryptionService, CredentialShareService credentialShareService, AuditLogService auditLogService) {
         this.credentialRepository = credentialRepository;
         this.userRepository = userRepository;
         this.encryptionService = encryptionService;
         this.credentialShareService = credentialShareService;
+        this.auditLogService = auditLogService;
     }
 
     // create a new credential
@@ -71,6 +73,14 @@ public class CredentialService {
         credential.setDeleted(false);
         Credential savedCredential = credentialRepository.save(credential);
 
+        // Create an audit log entry
+        auditLogService.log(
+                "CREATE",
+                "CREDENTIAL",
+                credential.getId(),
+                "Created credential: " + credential.getTitle()
+        );
+
         return CredentialResponseDto.fromEntity(savedCredential);
     }
 
@@ -109,6 +119,14 @@ public class CredentialService {
                 encryptionService.decrypt(credential.getPassword());
 
         dto.setPassword(decryptedPassword);
+
+        auditLogService.log(
+                "VIEW",
+                "CREDENTIAL",
+                credential.getId(),
+                "Viewed credential: "
+                        + credential.getTitle()
+        );
 
         return ResponseEntity.ok(dto);
     }
@@ -197,6 +215,15 @@ public class CredentialService {
 
         // convert to dto
         CredentialResponseDto responseDto = CredentialResponseDto.fromEntity(updatedCredential);
+
+        // Create an audit log entry
+        auditLogService.log(
+                "UPDATE",
+                "CREDENTIAL",
+                updatedCredential.getId(),
+                "Updated credential: "
+                        + updatedCredential.getTitle()
+        );
         return ResponseEntity.ok(responseDto);
     }
 
@@ -218,7 +245,16 @@ public class CredentialService {
                        new RuntimeException("Credential not found or access denied")
                );
 
-      credentialRepository.delete(credential);
+                credential.setDeleted(true);
+      credentialRepository.save(credential);
+      // create audit log entry
+        auditLogService.log(
+                "DELETE",
+                "CREDENTIAL",
+                credential.getId(),
+                "Deleted credential: "
+                        + credential.getTitle()
+        );
       return ResponseEntity.ok("Credential deleted successfully");
     }
 
@@ -244,6 +280,15 @@ public class CredentialService {
         // mark the credential as deleted --> soft-delete
         credential.setDeleted(true);
         credentialRepository.save(credential);
+
+        // Create an audit log entry
+        auditLogService.log(
+                "DELETE",
+                "CREDENTIAL",
+                credential.getId(),
+                "Deleted credential: "
+                        + credential.getTitle()
+        );
 
         return ResponseEntity.ok("Credential moved to trash successfully");
     }
